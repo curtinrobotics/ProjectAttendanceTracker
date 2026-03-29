@@ -20,11 +20,10 @@
       --error-border: #ef4444;
       --error-text: #991b1b;
       --shadow: 0 16px 32px rgba(23, 33, 43, 0.08);
+      --focus-ring: rgba(15, 118, 110, 0.18);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -37,13 +36,8 @@
       color: var(--text);
     }
 
-    h1 {
-      margin-bottom: 8px;
-    }
-
-    p {
-      color: var(--muted);
-    }
+    h1 { margin-bottom: 8px; }
+    p { color: var(--muted); }
 
     .card {
       background: var(--panel);
@@ -54,13 +48,6 @@
       box-shadow: var(--shadow);
     }
 
-    .scanner-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-
     .top-layout {
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.9fr);
@@ -68,72 +55,173 @@
       align-items: start;
     }
 
-    #reader {
+    .scanner-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .reader-shell {
+      position: relative;
       width: 100%;
-      height: 240px;
-      background: black;
+      min-height: 260px;
+      background: #000;
       border-radius: 12px;
       border: 1px solid var(--border);
       overflow: hidden;
+      isolation: isolate;
     }
 
-    #reader video {
+    #reader {
+      width: 100%;
+      min-height: 260px;
+      background: #000;
+    }
+
+    #reader video,
+    #reader canvas {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    input, button {
+    #reader video { z-index: 0; }
+    #reader canvas { z-index: 1; }
+
+    .scan-window {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(84%, 420px);
+      height: min(40%, 180px);
+      transform: translate(-50%, -50%);
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 0 0 9999px rgba(0, 0, 0, 0.28),
+        0 0 0 2px rgba(255, 255, 255, 0.15) inset;
+      z-index: 3;
+      pointer-events: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+    }
+
+    .scan-window.hidden {
+      display: none;
+    }
+
+    .scan-window.flash-success {
+      border-color: rgba(34, 197, 94, 0.98);
+      background: rgba(34, 197, 94, 0.15);
+      box-shadow:
+        0 0 0 9999px rgba(0, 0, 0, 0.18),
+        0 0 0 2px rgba(34, 197, 94, 0.35) inset,
+        0 0 0 3px rgba(34, 197, 94, 0.22);
+    }
+
+    input, button, select {
       font-size: 16px;
       padding: 12px 14px;
       border-radius: 12px;
       border: 1px solid var(--border);
     }
 
-    input {
+    input, select {
       width: 100%;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--focus-ring);
     }
 
     button {
       cursor: pointer;
       border: 0;
       background: var(--accent);
-      color: white;
+      color: #fff;
       font-weight: 700;
     }
 
-    button:hover {
-      background: var(--accent-strong);
+    button:hover { background: var(--accent-strong); }
+
+    button.secondary {
+      background: #e7eef5;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover { background: #dde7f1; }
+
+    button:disabled,
+    input:disabled,
+    select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .button-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-top: 14px;
     }
 
-    .manual-panel {
-      display: grid;
-      gap: 16px;
-      align-content: start;
+    .auth-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
-    .manual-panel h2,
-    .scan-panel h2,
-    .session-panel h2,
-    .status-panel h2,
-    .history-panel h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
+    .auth-row input {
+      flex: 1 1 240px;
     }
 
-    .session-banner {
+    .auth-message,
+    .settings-note {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .auth-message.success,
+    .settings-note.success {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+
+    .auth-message.error,
+    .settings-note.error {
+      background: var(--error-bg);
+      border-color: var(--error-border);
+      color: var(--error-text);
+    }
+
+    .session-banner,
+    .status-banner {
       border-radius: 16px;
       border: 2px solid var(--border);
       padding: 16px 18px;
       display: grid;
       gap: 6px;
       background: #f8fafc;
+    }
+
+    .status-banner {
+      min-height: 96px;
+      align-content: center;
     }
 
     .session-banner.open {
@@ -146,17 +234,6 @@
       background: #eef6ff;
       border-color: #60a5fa;
       color: #1d4ed8;
-    }
-
-    .status-banner {
-      border-radius: 16px;
-      border: 2px solid var(--border);
-      padding: 16px 18px;
-      min-height: 96px;
-      display: grid;
-      gap: 6px;
-      align-content: center;
-      background: #f8fafc;
     }
 
     .status-banner.success {
@@ -191,6 +268,22 @@
       opacity: 0.9;
     }
 
+    .manual-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .manual-panel h2,
+    .scan-panel h2,
+    .session-panel h2,
+    .status-panel h2,
+    .history-panel h2,
+    .settings-panel h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
     .history-list {
       list-style: none;
       margin: 0;
@@ -219,67 +312,125 @@
       color: var(--muted);
     }
 
-    .muted {
+    .empty-state,
+    .muted,
+    .mini-help {
       color: var(--muted);
       font-size: 14px;
-    }
-
-    .empty-state {
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .auth-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .auth-row input {
-      flex: 1 1 240px;
-    }
-
-    .auth-message {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .auth-message.success {
-      background: var(--success-bg);
-      border-color: var(--success-border);
-      color: var(--success-text);
-    }
-
-    .auth-message.error {
-      background: var(--error-bg);
-      border-color: var(--error-border);
-      color: var(--error-text);
     }
 
     .hidden {
+      display: none !important;
+    }
+
+    details.options {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+
+    details.options summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 16px;
+      font-weight: 700;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    details.options summary::-webkit-details-marker {
       display: none;
     }
 
+    details.options summary::after {
+      content: "▾";
+      font-size: 18px;
+      color: var(--muted);
+      transition: transform 140ms ease;
+    }
+
+    details.options[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .settings-body {
+      padding: 0 16px 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 16px;
+    }
+
+    .setting-field {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .setting-field > span,
+    .checkbox-row > span {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .range-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .inline-value {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      min-height: 52px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+
+    .option-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .scanner-footnote {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    @media (max-width: 980px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 900px) {
-      body {
-        padding: 16px;
-      }
-
+      body { padding: 16px; }
       .top-layout,
-      .scanner-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .status-message {
-        font-size: 22px;
-      }
+      .scanner-layout { grid-template-columns: 1fr; }
+      .status-message { font-size: 22px; }
     }
   </style>
 </head>
@@ -319,12 +470,123 @@
   <div class="scanner-layout">
     <div class="card scan-panel">
       <h2>Student Card Barcode Scanner</h2>
-      <div id="reader"></div>
-      <div class="button-row">
-        <button id="startBtn">Start Camera</button>
-        <button id="stopBtn">Stop Camera</button>
+
+      <div class="reader-shell" id="readerShell">
+        <div id="reader"></div>
+        <div id="scanWindow" class="scan-window"></div>
       </div>
-      <div class="muted">Best used in Chrome on a phone or laptop.</div>
+
+      <div class="button-row">
+        <button id="startBtn" type="button">Start Camera</button>
+        <button id="stopBtn" type="button" class="secondary">Stop Camera</button>
+      </div>
+
+      <div class="scanner-footnote">
+        <div class="muted">Best used in Chrome on a phone or laptop. Manual focus depends on what the current browser and camera actually expose.</div>
+      </div>
+
+      <div class="card settings-panel" style="margin-top:16px; margin-bottom:0;">
+        <details id="optionsDetails" class="options">
+          <summary>Scanner Options</summary>
+          <div class="settings-body">
+            <div class="settings-grid">
+              <label class="setting-field">
+                <span>Barcode type</span>
+                <select id="barcodeTypeSelect">
+                  <option value="code_128_reader">Code 128 (default)</option>
+                  <option value="auto">Auto detect</option>
+                  <option value="code_93_reader">Code 93</option>
+                  <option value="code_39_reader">Code 39</option>
+                  <option value="ean_reader">EAN-13</option>
+                  <option value="ean_8_reader">EAN-8</option>
+                  <option value="upc_reader">UPC-A</option>
+                  <option value="upc_e_reader">UPC-E</option>
+                  <option value="codabar_reader">Codabar</option>
+                  <option value="i2of5_reader">Interleaved 2 of 5</option>
+                  <option value="2of5_reader">Standard 2 of 5</option>
+                  <option value="code_32_reader">Code 32</option>
+                  <option value="pharmacode_reader">Pharmacode</option>
+                </select>
+              </label>
+
+              <label class="setting-field">
+                <span>Camera select</span>
+                <select id="cameraSelect">
+                  <option value="auto">Auto (preferred back camera)</option>
+                </select>
+              </label>
+
+              <label class="setting-field">
+                <span>Resolution</span>
+                <select id="resolutionSelect">
+                  <option value="640x480">640 × 480</option>
+                  <option value="1280x720">1280 × 720</option>
+                  <option value="1920x1080">1920 × 1080</option>
+                  <option value="2560x1440">2560 × 1440</option>
+                </select>
+              </label>
+
+              <label class="setting-field">
+                <span>Focus settings</span>
+                <select id="focusModeSelect">
+                  <option value="auto">Auto</option>
+                  <option value="manual">Manual</option>
+                </select>
+              </label>
+
+              <label class="setting-field">
+                <span>Manual focal distance</span>
+                <div class="range-row">
+                  <input id="focusDistanceRange" type="range" min="0" max="1" step="0.01" value="0.25" disabled>
+                  <div id="focusDistanceValue" class="inline-value">Saved value: 0.25</div>
+                </div>
+              </label>
+
+              <label class="checkbox-row">
+                <input id="scanWindowToggle" type="checkbox" checked>
+                <span>Use scan window</span>
+              </label>
+
+              <label class="checkbox-row">
+                <input id="playSoundToggle" type="checkbox" checked>
+                <span>Play sound on successful sign-in</span>
+              </label>
+
+              <label class="setting-field">
+                <span>Sound volume</span>
+                <div class="range-row">
+                  <input id="soundVolumeRange" type="range" min="0" max="500" step="5" value="100">
+                  <div id="soundVolumeValue" class="inline-value">100%</div>
+                </div>
+              </label>
+
+              <label class="checkbox-row">
+                <input id="pauseAfterScanToggle" type="checkbox">
+                <span>Pause after scan</span>
+              </label>
+
+              <label class="setting-field">
+                <span>Pause time (seconds)</span>
+                <input id="pauseTimeInput" type="number" min="0.5" max="30" step="0.5" value="2">
+              </label>
+
+              <label class="checkbox-row">
+                <input id="dummyModeToggle" type="checkbox">
+                <span>Dummy mode (local testing only, no spreadsheet required)</span>
+              </label>
+            </div>
+
+            <div class="option-actions">
+              <button id="applySettingsBtn" type="button">Apply Settings</button>
+              <button id="refreshCamerasBtn" type="button" class="secondary">Refresh Cameras</button>
+              <button id="restoreDefaultsBtn" type="button" class="secondary">Restore Defaults</button>
+            </div>
+
+            <p class="mini-help">Dummy mode keeps everything in this browser only. Focus controls are best-effort because browsers only expose the features the active camera supports.</p>
+            <div id="settingsNote" class="settings-note">Settings are saved in this browser. Change the scanner options, then click Apply Settings if you want the running camera to restart with the new scanner settings.</div>
+          </div>
+        </details>
+      </div>
     </div>
 
     <div class="card manual-panel">
@@ -333,7 +595,7 @@
         <p class="muted">Use this if the barcode cannot be read.</p>
       </div>
       <input id="studentNumber" type="text" placeholder="Enter student ID">
-      <button id="manualBtn">Sign In Manually</button>
+      <button id="manualBtn" type="button">Sign In Manually</button>
     </div>
   </div>
 
@@ -344,173 +606,115 @@
     </ul>
   </div>
 
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js" type="text/javascript"></script>
   <script>
-    const CONFIG = {
-      apiUrl: "https://script.google.com/a/macros/curtinrobotics.org/s/AKfycbxbtjGnYnX-rOlHUqzeRgab_kr1f78N9hr90eD6a0TqUcCXSB0W6IZDy8vsBg1WOO4g/exec",
-      duplicateCooldownMs: 3000,
-      recentLimit: 12
-    };
+    (() => {
+      "use strict";
 
-    const el = {
-      pageTitle: document.getElementById("pageTitle"),
-      accessCard: document.getElementById("accessCard"),
-      passwordInput: document.getElementById("passwordInput"),
-      unlockBtn: document.getElementById("unlockBtn"),
-      authMessage: document.getElementById("authMessage"),
-      reader: document.getElementById("reader"),
-      statusBanner: document.getElementById("statusBanner"),
-      statusMessage: document.getElementById("statusMessage"),
-      statusDetail: document.getElementById("statusDetail"),
-      sessionBanner: document.getElementById("sessionBanner"),
-      sessionMessage: document.getElementById("sessionMessage"),
-      sessionDetail: document.getElementById("sessionDetail"),
-      studentInput: document.getElementById("studentNumber"),
-      startBtn: document.getElementById("startBtn"),
-      stopBtn: document.getElementById("stopBtn"),
-      manualBtn: document.getElementById("manualBtn"),
-      recentList: document.getElementById("recentList"),
-      recentEmpty: document.getElementById("recentEmpty"),
-    };
+      const APP_CONFIG = {
+        apiUrl: "https://script.google.com/a/macros/curtinrobotics.org/s/AKfycbxbtjGnYnX-rOlHUqzeRgab_kr1f78N9hr90eD6a0TqUcCXSB0W6IZDy8vsBg1WOO4g/exec",
+        duplicateCooldownMs: 3000,
+        recentLimit: 12,
+        settingsStorageKey: "attendance-scanner-settings-v3"
+      };
 
-    const app = {
-      recentSignIns: [],
-      scanning: false,
-      html5QrCode: null,
-      lastScannedValue: "",
-      lastScannedTime: 0,
-      currentSessionName: "",
-      currentSessionOpen: false,
-      keyboardBuffer: "",
-      keyboardTimer: null,
-      unlocked: false,
-      password: "",
-      setProjectName(projectName) {
-        const name = projectName || "Project";
-        document.title = `${name} Attendance`;
-        el.pageTitle.textContent = `${name} Attendance`;
-      },
-      setUnlocked(unlocked) {
-        this.unlocked = unlocked;
-        el.studentInput.disabled = !unlocked;
-        el.manualBtn.disabled = !unlocked;
-        el.startBtn.disabled = !unlocked;
-        if (!unlocked) {
-          this.stopScanner();
-          el.accessCard.classList.remove("hidden");
-        }
-      },
-      setAuthMessage(message, type = "") {
-        el.authMessage.className = `auth-message ${type}`.trim();
-        el.authMessage.textContent = message;
-      },
-      setStatus(message, detail = "", type = "") {
-        el.statusBanner.className = `status-banner ${type}`.trim();
-        el.statusMessage.textContent = message;
-        el.statusDetail.textContent = detail;
-      },
-      setSessionInfo(message, detail = "", type = "") {
-        el.sessionBanner.className = `session-banner ${type}`.trim();
-        el.sessionMessage.textContent = message;
-        el.sessionDetail.textContent = detail;
-      },
-      applySessionStatus(result) {
-        this.setProjectName(result.projectName);
-        this.currentSessionOpen = !!(result.sessionStatus && result.sessionStatus.isOpen);
+      const RESOLUTION_PRESETS = {
+        "640x480": { width: 640, height: 480 },
+        "1280x720": { width: 1280, height: 720 },
+        "1920x1080": { width: 1920, height: 1080 },
+        "2560x1440": { width: 2560, height: 1440 }
+      };
 
-        if (result.sessionStatus && result.sessionStatus.currentSession) {
-          this.currentSessionName = result.sessionStatus.currentSession.sessionName || "";
-          const summary = this.sessionSummary(result.sessionStatus.currentSession);
-          this.setSessionInfo("Open now", summary, "open");
-          this.setStatus("Ready", summary);
-          return;
-        }
+      const ALL_READERS = [
+        "code_128_reader",
+        "code_93_reader",
+        "code_39_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "codabar_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_32_reader",
+        "pharmacode_reader"
+      ];
 
-        this.currentSessionName = "";
-        if (result.sessionStatus && result.sessionStatus.nextSession) {
-          const nextSummary = this.sessionSummary(result.sessionStatus.nextSession);
-          this.setSessionInfo("No session open", `Next session: ${nextSummary}`, "closed");
-          this.setStatus("No session open", `Next session: ${nextSummary}`);
-          return;
-        }
+      const DEFAULT_SETTINGS = Object.freeze({
+        barcodeType: "code_128_reader",
+        cameraId: "auto",
+        resolution: "2560x1440",
+        focusMode: "auto",
+        focusDistance: 0.25,
+        playSound: true,
+        soundVolume: 100,
+        pauseAfterScan: false,
+        pauseTimeSeconds: 2,
+        dummyMode: false,
+        scanWindowEnabled: true,
+        optionsOpen: false
+      });
 
-        this.setSessionInfo("No session configured", "Add an active session in the Config tab.", "closed");
-        this.setStatus("Backend configuration error", "No active or upcoming sessions are configured.", "error");
-      },
-      sessionDetail(result) {
-        return [result.session || this.currentSessionName, result.sessionTimes, result.day].filter(Boolean).join(" • ");
-      },
-      sessionSummary(session) {
+      const dom = {
+        pageTitle: document.getElementById("pageTitle"),
+        accessCard: document.getElementById("accessCard"),
+        passwordInput: document.getElementById("passwordInput"),
+        unlockBtn: document.getElementById("unlockBtn"),
+        authMessage: document.getElementById("authMessage"),
+        reader: document.getElementById("reader"),
+        readerShell: document.getElementById("readerShell"),
+        scanWindow: document.getElementById("scanWindow"),
+        statusBanner: document.getElementById("statusBanner"),
+        statusMessage: document.getElementById("statusMessage"),
+        statusDetail: document.getElementById("statusDetail"),
+        sessionBanner: document.getElementById("sessionBanner"),
+        sessionMessage: document.getElementById("sessionMessage"),
+        sessionDetail: document.getElementById("sessionDetail"),
+        studentInput: document.getElementById("studentNumber"),
+        startBtn: document.getElementById("startBtn"),
+        stopBtn: document.getElementById("stopBtn"),
+        manualBtn: document.getElementById("manualBtn"),
+        recentList: document.getElementById("recentList"),
+        recentEmpty: document.getElementById("recentEmpty"),
+        optionsDetails: document.getElementById("optionsDetails"),
+        barcodeTypeSelect: document.getElementById("barcodeTypeSelect"),
+        cameraSelect: document.getElementById("cameraSelect"),
+        resolutionSelect: document.getElementById("resolutionSelect"),
+        focusModeSelect: document.getElementById("focusModeSelect"),
+        focusDistanceRange: document.getElementById("focusDistanceRange"),
+        focusDistanceValue: document.getElementById("focusDistanceValue"),
+        scanWindowToggle: document.getElementById("scanWindowToggle"),
+        playSoundToggle: document.getElementById("playSoundToggle"),
+        soundVolumeRange: document.getElementById("soundVolumeRange"),
+        soundVolumeValue: document.getElementById("soundVolumeValue"),
+        pauseAfterScanToggle: document.getElementById("pauseAfterScanToggle"),
+        pauseTimeInput: document.getElementById("pauseTimeInput"),
+        dummyModeToggle: document.getElementById("dummyModeToggle"),
+        applySettingsBtn: document.getElementById("applySettingsBtn"),
+        refreshCamerasBtn: document.getElementById("refreshCamerasBtn"),
+        restoreDefaultsBtn: document.getElementById("restoreDefaultsBtn"),
+        settingsNote: document.getElementById("settingsNote")
+      };
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function wait(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, ms));
+      }
+
+      function sessionSummary(session) {
         return session
           ? [session.sessionName, session.sessionTimes, session.day].filter(Boolean).join(" • ")
           : "";
-      },
-      addRecent(identifier, memberType, method, sessionName) {
-        this.recentSignIns.unshift({
-          identifier,
-          memberType,
-          method,
-          sessionName,
-          signedInAt: new Date()
-        });
-        if (this.recentSignIns.length > CONFIG.recentLimit) {
-          this.recentSignIns.length = CONFIG.recentLimit;
-        }
-      },
-      renderRecentSignIns() {
-        el.recentList.innerHTML = "";
-        if (!this.recentSignIns.length) {
-          el.recentList.appendChild(el.recentEmpty);
-          return;
-        }
-        this.recentSignIns.forEach((entry) => {
-          const item = document.createElement("li");
-          item.className = "history-item";
-          const left = document.createElement("div");
-          const name = document.createElement("div");
-          name.className = "history-name";
-          name.textContent = entry.identifier;
-          const meta = document.createElement("div");
-          meta.className = "history-meta";
-          meta.textContent = `${entry.memberType} • ${entry.method} • ${entry.sessionName}`;
-          const right = document.createElement("div");
-          right.className = "history-meta";
-          right.textContent = entry.signedInAt.toLocaleTimeString();
-          left.appendChild(name);
-          left.appendChild(meta);
-          item.appendChild(left);
-          item.appendChild(right);
-          el.recentList.appendChild(item);
-        });
-      },
-      request(params, requirePassword = true) {
-        return new Promise((resolve, reject) => {
-          if (requirePassword && !this.password) {
-            reject(new Error("Enter the attendance password before signing people in."));
-            return;
-          }
-          const callbackName = `jsonp_cb_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-          const script = document.createElement("script");
-          const query = new URLSearchParams({ ...params, password: this.password, callback: callbackName }).toString();
-          window[callbackName] = function(response) {
-            cleanup();
-            resolve(response);
-          };
-          script.onerror = function() {
-            cleanup();
-            reject(new Error("Request failed."));
-          };
-          function cleanup() {
-            delete window[callbackName];
-            if (script.parentNode) {
-              script.parentNode.removeChild(script);
-            }
-          }
-          script.src = `${CONFIG.apiUrl}?${query}`;
-          document.body.appendChild(script);
-        });
-      },
-      normalize(rawValue) {
+      }
+
+      function sessionDetail(result, currentSessionName) {
+        return [result.session || currentSessionName, result.sessionTimes, result.day].filter(Boolean).join(" • ");
+      }
+
+      function normalizeIdentifier(rawValue) {
         const cleaned = String(rawValue || "").trim().toUpperCase().replace(/\s+/g, "");
         if (/^\d{8}$/.test(cleaned)) {
           return { identifier: cleaned, memberType: "Student" };
@@ -527,284 +731,1270 @@
             return { identifier: suffix, memberType: "Staff" };
           }
         }
-
         throw new Error("Use a student ID like xxx12345678 or a staff ID like xxx123456A.");
-      },
-      async startScanner() {
-        if (!this.unlocked) {
-          this.setStatus("Password required", "Enter the attendance password first.", "error");
-          return;
-        }
-        if (!("mediaDevices" in navigator) || !("getUserMedia" in navigator.mediaDevices)) {
-          this.setStatus("Camera unavailable", "Camera access is not supported in this browser.", "error");
-          return;
-        }
-        if (!window.Html5Qrcode) {
-          this.setStatus("Scanner unavailable", "Barcode scanning library did not load. Use manual entry.", "error");
-          return;
-        }
-        try {
-          if (!this.html5QrCode) {
-            this.html5QrCode = new Html5Qrcode("reader");
-          }
-          const cameraOptions = await this.buildCameraOptions();
-          let started = false;
-          let lastError = null;
+      }
 
-          for (let i = 0; i < cameraOptions.length; i += 1) {
+      class SettingsStore {
+        static load() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(APP_CONFIG.settingsStorageKey) || "{}");
+            return this.sanitize({ ...DEFAULT_SETTINGS, ...saved });
+          } catch (_error) {
+            return { ...DEFAULT_SETTINGS };
+          }
+        }
+
+        static save(settings) {
+          localStorage.setItem(APP_CONFIG.settingsStorageKey, JSON.stringify(this.sanitize(settings)));
+        }
+
+        static reset() {
+          localStorage.removeItem(APP_CONFIG.settingsStorageKey);
+          return { ...DEFAULT_SETTINGS };
+        }
+
+        static sanitize(settings) {
+          const resolution = RESOLUTION_PRESETS[settings.resolution] ? settings.resolution : DEFAULT_SETTINGS.resolution;
+          const barcodeType = settings.barcodeType === "auto" || ALL_READERS.includes(settings.barcodeType)
+            ? settings.barcodeType
+            : DEFAULT_SETTINGS.barcodeType;
+          return {
+            barcodeType,
+            cameraId: typeof settings.cameraId === "string" && settings.cameraId ? settings.cameraId : DEFAULT_SETTINGS.cameraId,
+            resolution,
+            focusMode: settings.focusMode === "manual" ? "manual" : "auto",
+            focusDistance: Number.isFinite(Number(settings.focusDistance))
+              ? Number(settings.focusDistance)
+              : DEFAULT_SETTINGS.focusDistance,
+            playSound: !!settings.playSound,
+            soundVolume: clamp(Number(settings.soundVolume || DEFAULT_SETTINGS.soundVolume), 0, 500),
+            pauseAfterScan: !!settings.pauseAfterScan,
+            pauseTimeSeconds: clamp(Number(settings.pauseTimeSeconds || DEFAULT_SETTINGS.pauseTimeSeconds), 0.5, 30),
+            dummyMode: !!settings.dummyMode,
+            scanWindowEnabled: settings.scanWindowEnabled !== false,
+            optionsOpen: !!settings.optionsOpen
+          };
+        }
+      }
+
+      class SoundPlayer {
+        constructor() {
+          this.audioContext = null;
+          this.masterCompressor = null;
+        }
+
+        getContext() {
+          const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextCtor) {
+            return null;
+          }
+          if (!this.audioContext) {
+            this.audioContext = new AudioContextCtor();
+          }
+          if (this.audioContext.state === "suspended") {
+            this.audioContext.resume().catch(() => {});
+          }
+          if (!this.masterCompressor) {
+            this.masterCompressor = this.audioContext.createDynamicsCompressor();
+            this.masterCompressor.threshold.value = -24;
+            this.masterCompressor.knee.value = 24;
+            this.masterCompressor.ratio.value = 8;
+            this.masterCompressor.attack.value = 0.003;
+            this.masterCompressor.release.value = 0.18;
+            this.masterCompressor.connect(this.audioContext.destination);
+          }
+          return this.audioContext;
+        }
+
+        play(kind, volumePercent) {
+          const ctx = this.getContext();
+          if (!ctx || volumePercent <= 0) {
+            return;
+          }
+
+          const isError = kind === "error";
+          const tones = isError
+            ? [220, 174.61]
+            : [1046.5, 1318.5, 1568];
+          const gainBoost = clamp(volumePercent / 100, 0, 5);
+          const peak = clamp((isError ? 0.14 : 0.18) * gainBoost, 0.02, 1.2);
+          const duration = isError ? 0.22 : 0.2;
+          const now = ctx.currentTime;
+
+          tones.forEach((frequency, index) => {
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+            oscillator.type = index === 0 ? "square" : "triangle";
+            oscillator.frequency.value = frequency;
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(peak / (index + 1), now + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+            oscillator.connect(gain);
+            gain.connect(this.masterCompressor);
+            oscillator.start(now + index * 0.005);
+            oscillator.stop(now + duration + index * 0.005);
+          });
+        }
+      }
+
+      class BackendClient {
+        constructor(getPassword) {
+          this.getPassword = getPassword;
+        }
+
+        request(params, options = {}) {
+          const requirePassword = options.requirePassword !== false;
+
+          return new Promise((resolve, reject) => {
+            const password = this.getPassword();
+            if (requirePassword && !password) {
+              reject(new Error("Enter the attendance password before signing people in."));
+              return;
+            }
+
+            const callbackName = `jsonp_cb_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+            const script = document.createElement("script");
+            const query = new URLSearchParams({
+              ...params,
+              password: password || "",
+              callback: callbackName
+            }).toString();
+
+            const cleanup = () => {
+              delete window[callbackName];
+              if (script.parentNode) {
+                script.parentNode.removeChild(script);
+              }
+            };
+
+            window[callbackName] = (response) => {
+              cleanup();
+              resolve(response);
+            };
+
+            script.onerror = () => {
+              cleanup();
+              reject(new Error("Request failed."));
+            };
+
+            script.src = `${APP_CONFIG.apiUrl}?${query}`;
+            document.body.appendChild(script);
+          });
+        }
+      }
+
+
+      class CameraController {
+        constructor() {
+          this.devices = [];
+          this.capabilities = null;
+          this.focusRange = null;
+          this.pendingApplyToken = 0;
+        }
+
+        getDevices() {
+          return [...this.devices];
+        }
+
+        getCapabilities() {
+          return this.capabilities;
+        }
+
+        getFocusRange() {
+          return this.focusRange;
+        }
+
+        resetRuntimeState() {
+          this.capabilities = null;
+          this.focusRange = null;
+          this.pendingApplyToken += 1;
+        }
+
+        async enumerateDevices(constraints) {
+          this.devices = [];
+          if (!window.Quagga || !Quagga.CameraAccess || typeof Quagga.CameraAccess.enumerateVideoDevices !== "function") {
+            return [];
+          }
+
+          try {
+            this.devices = await Quagga.CameraAccess.enumerateVideoDevices(constraints);
+          } catch (_error) {
+            this.devices = [];
+          }
+
+          return this.getDevices();
+        }
+
+        getActiveTrack() {
+          try {
+            if (window.Quagga && Quagga.CameraAccess && typeof Quagga.CameraAccess.getActiveTrack === "function") {
+              return Quagga.CameraAccess.getActiveTrack();
+            }
+          } catch (_error) {}
+          return null;
+        }
+
+        async captureCapabilities() {
+          const track = this.getActiveTrack();
+          if (!track || typeof track.getCapabilities !== "function") {
+            this.capabilities = null;
+            this.focusRange = null;
+            return {
+              supported: false,
+              note: "The current browser did not expose advanced camera controls for this device."
+            };
+          }
+
+          this.capabilities = track.getCapabilities() || null;
+          this.focusRange = this.extractFocusRange(this.capabilities);
+
+          const notes = [];
+          if (this.capabilities && Array.isArray(this.capabilities.focusMode) && this.capabilities.focusMode.length) {
+            notes.push(`Camera focus modes: ${this.capabilities.focusMode.join(", ")}`);
+          }
+          if (this.focusRange) {
+            notes.push(`Manual focus range ${this.focusRange.min.toFixed(2)}–${this.focusRange.max.toFixed(2)}`);
+          }
+          if (!notes.length) {
+            notes.push("No advanced focus controls were reported for this camera.");
+          }
+
+          return {
+            supported: true,
+            note: notes.join(" • ")
+          };
+        }
+
+        extractFocusRange(capabilities) {
+          const focusDistance = capabilities && capabilities.focusDistance;
+          if (!focusDistance) {
+            return null;
+          }
+
+          const min = Number(focusDistance.min);
+          const max = Number(focusDistance.max);
+          if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) {
+            return null;
+          }
+
+          // Some browsers briefly report a placeholder 0–1 range while the camera warms up.
+          // Treat that as unreliable so it does not clamp the saved manual focus value.
+          if (min === 0 && max === 1) {
+            return null;
+          }
+
+          const step = Number(focusDistance.step) > 0
+            ? Number(focusDistance.step)
+            : Math.max((max - min) / 100, 0.01);
+
+          return { min, max, step };
+        }
+
+        resolveFocusModeForCamera(settings) {
+          const availableModes = this.capabilities && Array.isArray(this.capabilities.focusMode)
+            ? this.capabilities.focusMode
+            : [];
+
+          if (!availableModes.length) {
+            return null;
+          }
+
+          if (settings.focusMode === "manual") {
+            return availableModes.includes("manual") ? "manual" : null;
+          }
+
+          return availableModes.includes("continuous")
+            ? "continuous"
+            : (availableModes.includes("auto") ? "auto" : (availableModes.includes("single-shot") ? "single-shot" : null));
+        }
+
+        async tryApplyTrackConstraints(constraintCandidates) {
+          const track = this.getActiveTrack();
+          if (!track || typeof track.applyConstraints !== "function") {
+            return { ok: false, message: "Active camera track does not support applyConstraints()." };
+          }
+
+          let lastError = null;
+          for (const advanced of constraintCandidates) {
+            if (!advanced || !Object.keys(advanced).length) {
+              continue;
+            }
             try {
-              await this.html5QrCode.start(
-                cameraOptions[i].camera,
-                cameraOptions[i].config,
-                (decodedText) => this.handleScan(decodedText),
-                () => {}
-              );
-              started = true;
-              break;
+              await track.applyConstraints({ advanced: [advanced] });
+              return { ok: true, advanced };
             } catch (error) {
               lastError = error;
             }
           }
 
-          if (!started) {
-            throw lastError || new Error("No camera could be started.");
+          return {
+            ok: false,
+            message: lastError && lastError.message ? lastError.message : "The camera rejected the requested controls."
+          };
+        }
+
+        async applyControlsOnce(settings) {
+          const actualFocusMode = this.resolveFocusModeForCamera(settings);
+          const candidates = [];
+
+          if (settings.focusMode === "manual" && this.focusRange) {
+            const focusDistance = clamp(Number(settings.focusDistance), this.focusRange.min, this.focusRange.max);
+            const withModeAndDistance = {};
+            if (actualFocusMode) {
+              withModeAndDistance.focusMode = actualFocusMode;
+            }
+            withModeAndDistance.focusDistance = focusDistance;
+            candidates.push(withModeAndDistance);
+
+            if (actualFocusMode) {
+              candidates.push({ focusMode: actualFocusMode });
+            }
+            candidates.push({ focusDistance });
+          } else if (actualFocusMode) {
+            candidates.push({ focusMode: actualFocusMode });
           }
 
-          this.scanning = true;
-          this.setStatus(
-            "Scanner ready",
-            this.currentSessionName
-              ? `Current session: ${this.currentSessionName}`
-              : "Point the camera at the member barcode."
-          );
-        } catch (error) {
-          this.stopScanner();
-          this.setStatus(
-            "Camera unavailable",
-            `Could not start camera: ${error.message}. USB barcode scanner input and manual entry are still available.`,
-            "error"
-          );
+          if (!candidates.length) {
+            return { ok: false, message: "No supported camera controls were available to apply." };
+          }
+
+          return this.tryApplyTrackConstraints(candidates);
         }
-      },
-      stopScanner() {
-        this.scanning = false;
-        if (this.html5QrCode) {
-          this.html5QrCode.stop().catch(() => {}).then(() => {
-            if (el.reader) {
-              el.reader.innerHTML = "";
+
+        async applyControlsWithRetries(settings, shouldContinue) {
+          const token = ++this.pendingApplyToken;
+          const delays = [0, 180, 500, 1000];
+          let lastResult = null;
+          let capabilityNote = "";
+
+          for (const delay of delays) {
+            if (token !== this.pendingApplyToken || !shouldContinue()) {
+              return { cancelled: true };
+            }
+            if (delay) {
+              await wait(delay);
+            }
+
+            const capabilityState = await this.captureCapabilities();
+            capabilityNote = capabilityState.note || capabilityNote;
+            lastResult = await this.applyControlsOnce(settings);
+
+            if (lastResult && lastResult.ok) {
+              return {
+                ok: true,
+                applied: lastResult.advanced || {},
+                capabilityNote
+              };
+            }
+          }
+
+          return {
+            ok: false,
+            message: lastResult && lastResult.message ? lastResult.message : "The requested camera controls could not be applied.",
+            capabilityNote
+          };
+        }
+      }
+
+      class BarcodeScanner {
+        constructor(readerElement, onDetected) {
+          this.readerElement = readerElement;
+          this.onDetected = onDetected;
+          this.detectedHandler = null;
+          this.running = false;
+        }
+
+        isRunning() {
+          return this.running;
+        }
+
+        getResolutionConstraint(settings) {
+          const preset = RESOLUTION_PRESETS[settings.resolution] || RESOLUTION_PRESETS[DEFAULT_SETTINGS.resolution];
+          return {
+            width: { ideal: preset.width },
+            height: { ideal: preset.height },
+            aspectRatio: { ideal: preset.width / preset.height }
+          };
+        }
+
+        getReaderList(settings) {
+          if (settings.barcodeType === "auto") {
+            return [...ALL_READERS];
+          }
+          return [settings.barcodeType];
+        }
+
+        getInputArea(settings) {
+          if (!settings.scanWindowEnabled) {
+            return undefined;
+          }
+          return {
+            top: "26%",
+            right: "8%",
+            left: "8%",
+            bottom: "26%"
+          };
+        }
+
+        buildConfig(settings) {
+          const constraints = this.getResolutionConstraint(settings);
+          if (settings.cameraId && settings.cameraId !== "auto") {
+            constraints.deviceId = { exact: settings.cameraId };
+          } else {
+            constraints.facingMode = { ideal: "environment" };
+          }
+
+          return {
+            inputStream: {
+              name: "Live",
+              type: "LiveStream",
+              target: this.readerElement,
+              constraints,
+              area: this.getInputArea(settings)
+            },
+            locator: {
+              patchSize: "medium",
+              halfSample: true
+            },
+            numOfWorkers: Math.max(1, Math.min(4, navigator.hardwareConcurrency || 2)),
+            frequency: 10,
+            locate: true,
+            decoder: {
+              readers: this.getReaderList(settings),
+              multiple: false
+            }
+          };
+        }
+
+        async start(settings) {
+          if (!window.Quagga) {
+            throw new Error("Quagga2 did not load.");
+          }
+
+          await this.stop(true);
+
+          await new Promise((resolve, reject) => {
+            Quagga.init(this.buildConfig(settings), (error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve();
+            });
+          });
+
+          this.detectedHandler = (result) => {
+            const code = result && result.codeResult ? result.codeResult.code : "";
+            const format = result && result.codeResult ? result.codeResult.format || "" : "";
+            this.onDetected(code, format);
+          };
+
+          Quagga.offDetected();
+          Quagga.onDetected(this.detectedHandler);
+          Quagga.start();
+          this.running = true;
+        }
+
+        async stop(clearReader = true) {
+          this.running = false;
+
+          try {
+            if (window.Quagga) {
+              if (this.detectedHandler) {
+                try {
+                  Quagga.offDetected(this.detectedHandler);
+                } catch (_error) {
+                  Quagga.offDetected();
+                }
+              } else {
+                Quagga.offDetected();
+              }
+            }
+          } catch (_error) {}
+
+          try {
+            if (window.Quagga) {
+              Quagga.stop();
+            }
+          } catch (_error) {}
+
+          this.detectedHandler = null;
+          if (clearReader) {
+            this.readerElement.innerHTML = "";
+          }
+        }
+
+        async restart(settings) {
+          if (!this.running) {
+            return false;
+          }
+          await this.start(settings);
+          return true;
+        }
+      }
+
+      class AttendanceApp {
+        constructor(elements) {
+          this.el = elements;
+          this.settings = SettingsStore.load();
+          this.backend = new BackendClient(() => this.password);
+          this.soundPlayer = new SoundPlayer();
+          this.cameraController = new CameraController();
+          this.scanner = new BarcodeScanner(this.el.reader, (code, format) => this.handleScan(code, format));
+
+          this.recentSignIns = [];
+          this.unlocked = false;
+          this.password = "";
+          this.currentSessionName = "";
+          this.currentSessionOpen = false;
+          this.lastScannedValue = "";
+          this.lastScannedTime = 0;
+          this.keyboardBuffer = "";
+          this.keyboardTimer = null;
+          this.scanPausedUntil = 0;
+          this.scanPauseTimer = null;
+        }
+
+        async start() {
+          this.bindEvents();
+          this.renderSettings();
+          this.renderRecentSignIns();
+          this.applyModeState();
+          this.updatePauseControls();
+          this.updateScanWindowVisibility();
+          await this.refreshCameraList();
+          this.el.passwordInput.focus();
+        }
+
+        bindEvents() {
+          this.el.startBtn.addEventListener("click", () => this.startScanner());
+          this.el.stopBtn.addEventListener("click", () => this.stopScanner());
+          this.el.manualBtn.addEventListener("click", () => this.submitManual());
+          this.el.unlockBtn.addEventListener("click", () => this.unlock());
+
+          this.el.passwordInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              this.unlock();
+            }
+          });
+
+          this.el.studentInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              this.submitManual();
+            }
+          });
+
+          document.addEventListener("keydown", (event) => this.handleKeyboardScanner(event));
+
+          this.el.optionsDetails.addEventListener("toggle", () => {
+            this.settings.optionsOpen = this.el.optionsDetails.open;
+            this.saveSettings();
+          });
+
+          this.el.barcodeTypeSelect.addEventListener("change", () => this.updateSetting("barcodeType", this.el.barcodeTypeSelect.value));
+          this.el.cameraSelect.addEventListener("change", () => this.updateSetting("cameraId", this.el.cameraSelect.value));
+          this.el.resolutionSelect.addEventListener("change", () => this.updateSetting("resolution", this.el.resolutionSelect.value));
+
+          this.el.focusModeSelect.addEventListener("change", async () => {
+            this.updateSetting("focusMode", this.el.focusModeSelect.value);
+            this.refreshFocusUi();
+            if (this.scanner.isRunning()) {
+              await this.applyCameraControlsWithRetries();
+            }
+          });
+
+          this.el.focusDistanceRange.addEventListener("input", () => {
+            const nextValue = Number(this.el.focusDistanceRange.value);
+            this.settings.focusDistance = nextValue;
+            this.updateFocusDistanceLabel();
+            this.saveSettings();
+          });
+
+          this.el.focusDistanceRange.addEventListener("change", async () => {
+            if (!this.el.focusDistanceRange.disabled) {
+              this.settings.focusDistance = Number(this.el.focusDistanceRange.value);
+              this.saveSettings();
+              if (this.scanner.isRunning()) {
+                await this.applyCameraControlsWithRetries();
+              }
+            }
+          });
+
+          this.el.scanWindowToggle.addEventListener("change", () => {
+            this.updateSetting("scanWindowEnabled", this.el.scanWindowToggle.checked);
+            this.updateScanWindowVisibility();
+          });
+
+          this.el.playSoundToggle.addEventListener("change", () => {
+            this.updateSetting("playSound", this.el.playSoundToggle.checked);
+          });
+
+          this.el.soundVolumeRange.addEventListener("input", () => {
+            this.settings.soundVolume = Number(this.el.soundVolumeRange.value);
+            this.updateSoundVolumeLabel();
+            this.saveSettings();
+          });
+
+          this.el.pauseAfterScanToggle.addEventListener("change", () => {
+            this.updateSetting("pauseAfterScan", this.el.pauseAfterScanToggle.checked);
+            this.updatePauseControls();
+          });
+
+          this.el.pauseTimeInput.addEventListener("change", () => {
+            this.settings.pauseTimeSeconds = clamp(Number(this.el.pauseTimeInput.value || DEFAULT_SETTINGS.pauseTimeSeconds), 0.5, 30);
+            this.saveSettings();
+            this.renderSettings();
+            if (this.scanner.isRunning() && !this.settings.pauseAfterScan) {
+              this.clearPause();
+            }
+          });
+
+          this.el.dummyModeToggle.addEventListener("change", async () => {
+            this.updateSetting("dummyMode", this.el.dummyModeToggle.checked);
+            this.applyModeState();
+            if (this.scanner.isRunning()) {
+              await this.restartScanner();
+            } else {
+              this.updateFocusDistanceLabel();
+              this.setSettingsNote("Settings saved. Start the camera when you are ready.", "success");
+            }
+          });
+
+          this.el.refreshCamerasBtn.addEventListener("click", async () => {
+            await this.refreshCameraList();
+            this.setSettingsNote("Camera list refreshed.", "success");
+          });
+
+          this.el.restoreDefaultsBtn.addEventListener("click", async () => {
+            this.settings = SettingsStore.reset();
+            this.renderSettings();
+            this.applyModeState();
+            this.updatePauseControls();
+            this.updateScanWindowVisibility();
+            this.setSettingsNote("Defaults restored.", "success");
+            if (this.scanner.isRunning()) {
+              await this.restartScanner();
             }
           });
         }
-        this.setStatus("Camera stopped", "Manual entry is still available.");
-      },
-      async handleScan(rawValue) {
-        const value = String(rawValue || "").trim();
-        if (!value) {
-          return;
+
+        updateSetting(key, value) {
+          this.settings[key] = value;
+          this.saveSettings();
+          this.renderSettings();
         }
 
-        const now = Date.now();
-        if (value === this.lastScannedValue && now - this.lastScannedTime < CONFIG.duplicateCooldownMs) {
-          return;
+        saveSettings() {
+          SettingsStore.save(this.settings);
         }
 
-        this.lastScannedValue = value;
-        this.lastScannedTime = now;
-        await this.submit(value, "barcode");
-      },
-      async buildCameraOptions() {
-        const config = this.cameraConfig();
+        renderSettings() {
+          this.el.optionsDetails.open = !!this.settings.optionsOpen;
+          this.el.barcodeTypeSelect.value = this.settings.barcodeType;
+          this.el.resolutionSelect.value = this.settings.resolution;
+          this.el.focusModeSelect.value = this.settings.focusMode;
+          this.el.scanWindowToggle.checked = !!this.settings.scanWindowEnabled;
+          this.el.playSoundToggle.checked = !!this.settings.playSound;
+          this.el.soundVolumeRange.value = String(this.settings.soundVolume);
+          this.el.pauseAfterScanToggle.checked = !!this.settings.pauseAfterScan;
+          this.el.pauseTimeInput.value = String(this.settings.pauseTimeSeconds);
+          this.el.dummyModeToggle.checked = !!this.settings.dummyMode;
+          this.updateSoundVolumeLabel();
+          this.updateFocusDistanceLabel();
+          this.refreshFocusUi();
 
-        if (this.isMobileDevice()) {
-          return [
-            { camera: { facingMode: { exact: "environment" } }, config: config },
-            { camera: { facingMode: "environment" }, config: config },
-            { camera: { facingMode: "user" }, config: config }
-          ];
-        }
-
-        let devices = [];
-        try {
-          devices = await Html5Qrcode.getCameras();
-        } catch (_error) {
-          devices = [];
-        }
-
-        if (devices.length) {
-          return devices.map((device) => ({
-            camera: { deviceId: { exact: device.id } },
-            config: config
-          }));
-        }
-
-        return [
-          { camera: { facingMode: "environment" }, config: config },
-          { camera: { facingMode: "user" }, config: config }
-        ];
-      },
-      cameraConfig() {
-        return {
-          fps: 10,
-          qrbox: { width: 420, height: 180 },
-          aspectRatio: 1.7777778
-        };
-      },
-      isMobileDevice() {
-        return /android|iphone|ipad|ipod/i.test(navigator.userAgent || "");
-      },
-      focusInput() {
-        el.studentInput.focus();
-      },
-      handleKeyboardScanner(event) {
-        if (!this.unlocked) {
-          return;
-        }
-        if (event.ctrlKey || event.metaKey || event.altKey) {
-          return;
-        }
-        if (event.key === "Enter") {
-          const value = this.keyboardBuffer.trim();
-          this.clearKeyboardBuffer();
-          if (value) {
-            this.submit(value, "barcode");
-            event.preventDefault();
+          const cameraId = this.settings.cameraId || "auto";
+          if ([...this.el.cameraSelect.options].some((option) => option.value === cameraId)) {
+            this.el.cameraSelect.value = cameraId;
+          } else {
+            this.el.cameraSelect.value = "auto";
           }
-          return;
         }
-        if (event.key.length !== 1) {
-          return;
+
+        updateSoundVolumeLabel() {
+          this.el.soundVolumeValue.textContent = `${Math.round(this.settings.soundVolume)}%`;
         }
-        const tagName = event.target && event.target.tagName ? event.target.tagName.toLowerCase() : "";
-        if (tagName === "input" || tagName === "textarea") {
-          return;
-        }
-        this.keyboardBuffer += event.key;
-        if (this.keyboardTimer) {
-          clearTimeout(this.keyboardTimer);
-        }
-        this.keyboardTimer = window.setTimeout(() => this.clearKeyboardBuffer(), 250);
-      },
-      clearKeyboardBuffer() {
-        this.keyboardBuffer = "";
-        if (this.keyboardTimer) {
-          clearTimeout(this.keyboardTimer);
-          this.keyboardTimer = null;
-        }
-      },
-      async loadConfig() {
-        try {
-          const result = await this.request({ action: "config" });
-          if (result.success && result.projectName) {
-            this.setProjectName(result.projectName);
+
+        updateFocusDistanceLabel() {
+          const savedValue = Number(this.settings.focusDistance);
+          const focusRange = this.cameraController.getFocusRange();
+          if (focusRange) {
+            const clamped = clamp(savedValue, focusRange.min, focusRange.max);
+            if (this.settings.focusMode === "manual") {
+              this.el.focusDistanceValue.textContent = `Saved value: ${clamped.toFixed(2)}`;
+            } else {
+              this.el.focusDistanceValue.textContent = `Saved value: ${clamped.toFixed(2)} (used when Manual is selected)`;
+            }
+          } else if (this.settings.focusMode === "manual") {
+            this.el.focusDistanceValue.textContent = `Saved value: ${savedValue.toFixed(2)} • Waiting for camera capabilities`;
+          } else {
+            this.el.focusDistanceValue.textContent = `Saved value: ${savedValue.toFixed(2)} (used when Manual is selected)`;
           }
-        } catch (_error) {}
-      },
-      async refreshSessionStatus() {
-        try {
-          this.applySessionStatus(await this.request({ action: "session" }));
-        } catch (error) {
-          this.currentSessionName = "";
-          this.currentSessionOpen = false;
-          this.setSessionInfo("Session unavailable", error.message, "closed");
-          this.setStatus("Backend configuration error", error.message, "error");
         }
-      },
-      async submit(rawValue, method) {
-        try {
-          const normalized = this.normalize(rawValue);
-          this.setStatus("Saving sign-in...", `Submitting ${normalized.identifier}`);
-          const result = await this.request({ action: "signin", studentNumber: normalized.identifier, method });
-          if (result.duplicate) {
-            this.setStatus("Already signed in", `${normalized.memberType} ${normalized.identifier} is already recorded. ${this.sessionDetail(result)}`, "error");
+
+        refreshFocusUi() {
+          const manualSelected = this.settings.focusMode === "manual";
+          const focusRange = this.cameraController.getFocusRange();
+
+          if (focusRange) {
+            const clamped = clamp(Number(this.settings.focusDistance), focusRange.min, focusRange.max);
+            this.el.focusDistanceRange.min = String(focusRange.min);
+            this.el.focusDistanceRange.max = String(focusRange.max);
+            this.el.focusDistanceRange.step = String(focusRange.step);
+            this.el.focusDistanceRange.value = String(clamped);
+            this.el.focusDistanceRange.disabled = !manualSelected;
+          } else {
+            this.el.focusDistanceRange.disabled = true;
+          }
+
+          this.updateFocusDistanceLabel();
+        }
+
+        setProjectName(projectName) {
+          const name = projectName || "Project";
+          document.title = `${name} Attendance`;
+          this.el.pageTitle.textContent = `${name} Attendance`;
+        }
+
+        setAuthMessage(message, type = "") {
+          this.el.authMessage.className = `auth-message ${type}`.trim();
+          this.el.authMessage.textContent = message;
+        }
+
+        setSettingsNote(message, type = "") {
+          this.el.settingsNote.className = `settings-note ${type}`.trim();
+          this.el.settingsNote.textContent = message;
+        }
+
+        setStatus(message, detail = "", type = "") {
+          this.el.statusBanner.className = `status-banner ${type}`.trim();
+          this.el.statusMessage.textContent = message;
+          this.el.statusDetail.textContent = detail;
+        }
+
+        setSessionInfo(message, detail = "", type = "") {
+          this.el.sessionBanner.className = `session-banner ${type}`.trim();
+          this.el.sessionMessage.textContent = message;
+          this.el.sessionDetail.textContent = detail;
+        }
+
+        setUnlocked(unlocked) {
+          this.unlocked = unlocked;
+          this.el.studentInput.disabled = !unlocked;
+          this.el.manualBtn.disabled = !unlocked;
+          this.el.startBtn.disabled = !unlocked;
+          if (!unlocked) {
+            this.stopScanner();
+            this.el.accessCard.classList.remove("hidden");
+          }
+        }
+
+        applyModeState() {
+          if (this.settings.dummyMode) {
+            this.password = "";
+            this.setUnlocked(true);
+            this.currentSessionName = "Dummy Test Session";
+            this.currentSessionOpen = true;
+            this.setProjectName("Project");
+            this.setAuthMessage("Dummy mode is on. No spreadsheet access or password is required.", "success");
+            this.setSessionInfo("Dummy mode", "Local testing only. Nothing will be written to the spreadsheet.", "open");
+            this.setStatus("Ready", "Dummy mode is active. Test scans stay in this browser.");
+            this.setSettingsNote("Dummy mode is on. Sign-ins stay local to this browser.", "success");
+            this.el.accessCard.classList.add("hidden");
             return;
           }
-          if (!result.success) {
-            throw new Error([result.message || "Sign-in failed.", this.sessionDetail(result)].filter(Boolean).join(" "));
-          }
-          this.currentSessionName = result.session || this.currentSessionName;
-          this.setStatus("Sign-in recorded", `${normalized.memberType} ${normalized.identifier} • ${result.session} • ${result.sessionTimes || ""}`.trim(), "success");
-          this.addRecent(result.studentNumber || normalized.identifier, normalized.memberType, method, result.session || "Current session");
-          this.renderRecentSignIns();
-        } catch (error) {
-          this.setStatus("Sign-in failed", error.message, "error");
-          this.refreshSessionStatus();
-        }
-      },
-      submitManual() {
-        if (!this.unlocked) {
-          this.setStatus("Password required", "Enter the attendance password first.", "error");
-          return;
-        }
-        const value = el.studentInput.value.trim();
-        if (!value) {
-          this.setStatus("No value entered", "Please enter a student number or barcode.", "error");
-          return;
-        }
-        this.submit(value, "manual");
-        el.studentInput.value = "";
-        this.focusInput();
-      },
-      unlock() {
-        const password = el.passwordInput.value;
-        if (!password) {
-          this.failUnlock("Enter the attendance password first.");
-          return;
+
+          this.setUnlocked(false);
+          this.setAuthMessage("Enter the attendance password before scanning or signing in manually.");
+          this.setSessionInfo("Locked", "Enter the attendance password to load session details.");
+          this.setStatus("Ready", "Waiting for the next sign-in.");
+          this.setSettingsNote("Live mode is selected. Unlock access before scanning.");
         }
 
-        this.password = password;
-        this.request({ action: "verify" }, false).then((result) => {
-          if (!result.success) {
-            throw new Error(result.message || "The password is incorrect.");
+        updatePauseControls() {
+          this.el.pauseTimeInput.disabled = !this.settings.pauseAfterScan;
+          if (!this.settings.pauseAfterScan) {
+            this.clearPause();
           }
-          this.setUnlocked(true);
-          this.setAuthMessage("Access granted. You can now scan cards and record manual sign-ins.", "success");
-          this.applySessionStatus(result);
-          el.passwordInput.value = "";
+        }
+
+        updateScanWindowVisibility() {
+          this.el.scanWindow.classList.toggle("hidden", !this.settings.scanWindowEnabled);
+        }
+
+        flashScanWindowSuccess() {
+          if (!this.settings.scanWindowEnabled) {
+            return;
+          }
+          this.el.scanWindow.classList.remove("flash-success");
+          void this.el.scanWindow.offsetWidth;
+          this.el.scanWindow.classList.add("flash-success");
           window.setTimeout(() => {
-            if (this.unlocked) {
-              el.accessCard.classList.add("hidden");
-            }
-          }, 1200);
-          this.focusInput();
-        }).catch((error) => {
-          this.failUnlock(error.message || "The password is incorrect.");
-        });
-      },
-      failUnlock(message) {
-        this.password = "";
-        this.setUnlocked(false);
-        this.setAuthMessage(message, "error");
-        this.setStatus("Access denied", message, "error");
-        el.passwordInput.select();
-      },
-      bind() {
-        el.startBtn.addEventListener("click", () => this.startScanner());
-        el.stopBtn.addEventListener("click", () => this.stopScanner());
-        el.manualBtn.addEventListener("click", () => this.submitManual());
-        el.unlockBtn.addEventListener("click", () => this.unlock());
-        el.studentInput.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            this.submitManual();
-          }
-        });
-        el.passwordInput.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            this.unlock();
-          }
-        });
-        document.addEventListener("keydown", (event) => this.handleKeyboardScanner(event));
-      },
-      async start() {
-        this.setUnlocked(false);
-        this.setAuthMessage("Enter the attendance password before scanning or signing in manually.");
-        this.setSessionInfo("Locked", "Enter the attendance password to load session details.");
-        this.renderRecentSignIns();
-        this.bind();
-        el.passwordInput.focus();
-      }
-    };
+            this.el.scanWindow.classList.remove("flash-success");
+          }, 180);
+        }
 
-    app.start();
+        addRecent(identifier, memberType, method, sessionName) {
+          this.recentSignIns.unshift({
+            identifier,
+            memberType,
+            method,
+            sessionName,
+            signedInAt: new Date()
+          });
+          if (this.recentSignIns.length > APP_CONFIG.recentLimit) {
+            this.recentSignIns.length = APP_CONFIG.recentLimit;
+          }
+        }
+
+        renderRecentSignIns() {
+          this.el.recentList.innerHTML = "";
+          if (!this.recentSignIns.length) {
+            this.el.recentList.appendChild(this.el.recentEmpty);
+            return;
+          }
+
+          this.recentSignIns.forEach((entry) => {
+            const item = document.createElement("li");
+            item.className = "history-item";
+
+            const left = document.createElement("div");
+            const name = document.createElement("div");
+            name.className = "history-name";
+            name.textContent = entry.identifier;
+
+            const meta = document.createElement("div");
+            meta.className = "history-meta";
+            meta.textContent = `${entry.memberType} • ${entry.method} • ${entry.sessionName}`;
+
+            const right = document.createElement("div");
+            right.className = "history-meta";
+            right.textContent = entry.signedInAt.toLocaleTimeString();
+
+            left.appendChild(name);
+            left.appendChild(meta);
+            item.appendChild(left);
+            item.appendChild(right);
+            this.el.recentList.appendChild(item);
+          });
+        }
+
+        readableReaderName(value) {
+          if (value === "auto") {
+            return "Auto detect";
+          }
+          const option = this.el.barcodeTypeSelect.querySelector(`option[value="${CSS.escape(value)}"]`);
+          return option ? option.textContent : value;
+        }
+
+        async startScanner() {
+          if (!this.unlocked && !this.settings.dummyMode) {
+            this.setStatus("Password required", "Enter the attendance password first or enable Dummy mode.", "error");
+            return;
+          }
+
+          if (!window.Quagga) {
+            this.setStatus("Scanner unavailable", "Quagga2 did not load. Use manual entry.", "error");
+            return;
+          }
+
+          this.clearPause();
+          this.updateScanWindowVisibility();
+
+          try {
+            await this.scanner.start(this.settings);
+
+            this.setStatus(
+              "Scanner ready",
+              this.currentSessionName
+                ? `Current session: ${this.currentSessionName}`
+                : "Point the camera at the member barcode."
+            );
+            this.setSettingsNote(
+              `Running with ${this.readableReaderName(this.settings.barcodeType)} at ${this.settings.resolution}.`,
+              "success"
+            );
+
+            await this.refreshCameraList();
+            await this.applyCameraControlsWithRetries();
+          } catch (error) {
+            await this.stopScanner(true);
+            this.setStatus(
+              "Camera unavailable",
+              `Could not start camera: ${error && error.message ? error.message : "Unknown error"}. Manual entry is still available.`,
+              "error"
+            );
+          }
+        }
+
+        async stopScanner(silent = false) {
+          this.cameraController.resetRuntimeState();
+          await this.scanner.stop(true);
+          this.refreshFocusUi();
+
+          if (!silent) {
+            this.setStatus("Camera stopped", "Manual entry is still available.");
+          }
+        }
+
+        async restartScanner() {
+          if (!this.scanner.isRunning()) {
+            return;
+          }
+          await this.startScanner();
+        }
+
+        async refreshCameraList() {
+          const devices = await this.cameraController.enumerateDevices(this.scanner.getResolutionConstraint(this.settings));
+          const previous = this.settings.cameraId || "auto";
+          this.el.cameraSelect.innerHTML = "";
+
+          const autoOption = document.createElement("option");
+          autoOption.value = "auto";
+          autoOption.textContent = "Auto (preferred back camera)";
+          this.el.cameraSelect.appendChild(autoOption);
+
+          devices.forEach((device, index) => {
+            const option = document.createElement("option");
+            option.value = device.deviceId || "";
+            option.textContent = device.label || device.name || `Camera ${index + 1}`;
+            this.el.cameraSelect.appendChild(option);
+          });
+
+          const hasPrevious = previous === "auto" || devices.some((device) => device.deviceId === previous);
+          this.settings.cameraId = hasPrevious ? previous : "auto";
+          this.saveSettings();
+          this.renderSettings();
+        }
+
+        async applyCameraControlsWithRetries() {
+          const result = await this.cameraController.applyControlsWithRetries(
+            this.settings,
+            () => this.scanner.isRunning()
+          );
+
+          this.refreshFocusUi();
+
+          if (!result || result.cancelled) {
+            return;
+          }
+
+          if (result.ok) {
+            const applied = result.applied || {};
+            const notes = [];
+
+            if (applied.focusMode) {
+              notes.push(`Focus mode ${applied.focusMode}`);
+            }
+            if (Object.prototype.hasOwnProperty.call(applied, "focusDistance")) {
+              notes.push(`Manual focal distance ${Number(applied.focusDistance).toFixed(2)}`);
+              this.settings.focusDistance = Number(applied.focusDistance);
+              this.saveSettings();
+              this.refreshFocusUi();
+            }
+
+            this.setSettingsNote(notes.length ? `${notes.join(" • ")} applied.` : "Camera controls applied.", "success");
+            return;
+          }
+
+          if (result.capabilityNote) {
+            this.setSettingsNote(
+              `Camera started, but the browser rejected the focus controls: ${result.message}. ${result.capabilityNote}`,
+              "error"
+            );
+            return;
+          }
+
+          if (result.message) {
+            this.setSettingsNote(
+              `Camera started, but the browser rejected the focus controls: ${result.message}`,
+              "error"
+            );
+          }
+        }
+
+        handleKeyboardScanner(event) {
+          if (!this.unlocked) {
+            return;
+          }
+          if (event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+          }
+          if (event.key === "Enter") {
+            const value = this.keyboardBuffer.trim();
+            this.clearKeyboardBuffer();
+            if (value) {
+              this.submit(value, "barcode", "keyboard");
+              event.preventDefault();
+            }
+            return;
+          }
+          if (event.key.length !== 1) {
+            return;
+          }
+          const tagName = event.target && event.target.tagName ? event.target.tagName.toLowerCase() : "";
+          if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+            return;
+          }
+          this.keyboardBuffer += event.key;
+          if (this.keyboardTimer) {
+            clearTimeout(this.keyboardTimer);
+          }
+          this.keyboardTimer = window.setTimeout(() => this.clearKeyboardBuffer(), 250);
+        }
+
+        clearKeyboardBuffer() {
+          this.keyboardBuffer = "";
+          if (this.keyboardTimer) {
+            clearTimeout(this.keyboardTimer);
+            this.keyboardTimer = null;
+          }
+        }
+
+        focusInput() {
+          this.el.studentInput.focus();
+        }
+
+        isScanPaused() {
+          return Date.now() < this.scanPausedUntil;
+        }
+
+        clearPause() {
+          this.scanPausedUntil = 0;
+          if (this.scanPauseTimer) {
+            clearTimeout(this.scanPauseTimer);
+            this.scanPauseTimer = null;
+          }
+        }
+
+        beginPause() {
+          if (!this.settings.pauseAfterScan) {
+            return;
+          }
+          const pauseMs = Math.round(this.settings.pauseTimeSeconds * 1000);
+          this.scanPausedUntil = Date.now() + pauseMs;
+          if (this.scanPauseTimer) {
+            clearTimeout(this.scanPauseTimer);
+          }
+          this.scanPauseTimer = window.setTimeout(() => {
+            this.scanPausedUntil = 0;
+            if (this.scanner.isRunning()) {
+              this.setStatus(
+                "Scanner ready",
+                this.currentSessionName
+                  ? `Current session: ${this.currentSessionName}`
+                  : "Ready for the next barcode."
+              );
+            }
+          }, pauseMs);
+        }
+
+        playSound(kind) {
+          if (!this.settings.playSound) {
+            return;
+          }
+          this.soundPlayer.play(kind, Number(this.settings.soundVolume));
+        }
+
+        async handleScan(rawValue, format = "") {
+          const value = String(rawValue || "").trim();
+          if (!value || this.isScanPaused()) {
+            return;
+          }
+
+          const now = Date.now();
+          if (value === this.lastScannedValue && now - this.lastScannedTime < APP_CONFIG.duplicateCooldownMs) {
+            return;
+          }
+
+          this.lastScannedValue = value;
+          this.lastScannedTime = now;
+
+          await this.submit(value, "barcode", format);
+          this.beginPause();
+        }
+
+        async refreshSessionStatus() {
+          if (this.settings.dummyMode) {
+            this.currentSessionName = "Dummy Test Session";
+            this.currentSessionOpen = true;
+            this.setSessionInfo("Dummy mode", "Local testing only. Nothing will be written to the spreadsheet.", "open");
+            this.setStatus("Ready", "Dummy mode is active. Test scans stay in this browser.");
+            return;
+          }
+
+          try {
+            const result = await this.backend.request({ action: "session" });
+            this.applySessionStatus(result);
+          } catch (error) {
+            this.currentSessionName = "";
+            this.currentSessionOpen = false;
+            this.setSessionInfo("Session unavailable", error.message, "closed");
+            this.setStatus("Backend configuration error", error.message, "error");
+          }
+        }
+
+        applySessionStatus(result) {
+          this.setProjectName(result.projectName);
+          this.currentSessionOpen = !!(result.sessionStatus && result.sessionStatus.isOpen);
+
+          if (result.sessionStatus && result.sessionStatus.currentSession) {
+            this.currentSessionName = result.sessionStatus.currentSession.sessionName || "";
+            const summary = sessionSummary(result.sessionStatus.currentSession);
+            this.setSessionInfo("Open now", summary, "open");
+            this.setStatus("Ready", summary);
+            return;
+          }
+
+          this.currentSessionName = "";
+          if (result.sessionStatus && result.sessionStatus.nextSession) {
+            const nextSummary = sessionSummary(result.sessionStatus.nextSession);
+            this.setSessionInfo("No session open", `Next session: ${nextSummary}`, "closed");
+            this.setStatus("No session open", `Next session: ${nextSummary}`);
+            return;
+          }
+
+          this.setSessionInfo("No session configured", "Add an active session in the Config tab.", "closed");
+          this.setStatus("Backend configuration error", "No active or upcoming sessions are configured.", "error");
+        }
+
+        async unlock() {
+          if (this.settings.dummyMode) {
+            this.applyModeState();
+            return;
+          }
+
+          const password = this.el.passwordInput.value;
+          if (!password) {
+            this.failUnlock("Enter the attendance password first.");
+            return;
+          }
+
+          this.password = password;
+          try {
+            const result = await this.backend.request({ action: "verify" }, { requirePassword: false });
+            if (!result.success) {
+              throw new Error(result.message || "The password is incorrect.");
+            }
+
+            this.setUnlocked(true);
+            this.setAuthMessage("Access granted. You can now scan cards and record manual sign-ins.", "success");
+            this.applySessionStatus(result);
+            this.el.passwordInput.value = "";
+            window.setTimeout(() => {
+              if (this.unlocked && !this.settings.dummyMode) {
+                this.el.accessCard.classList.add("hidden");
+              }
+            }, 1200);
+            this.focusInput();
+            this.setSettingsNote("Live mode is on. Sign-ins will be written to the spreadsheet.", "success");
+          } catch (error) {
+            this.failUnlock(error.message || "The password is incorrect.");
+          }
+        }
+
+        failUnlock(message) {
+          this.password = "";
+          this.setUnlocked(false);
+          this.setAuthMessage(message, "error");
+          this.setStatus("Access denied", message, "error");
+          this.el.passwordInput.select();
+        }
+
+        async submitDummy(normalized, method) {
+          const sessionName = this.currentSessionName || "Dummy Test Session";
+          this.currentSessionName = sessionName;
+          this.setStatus(
+            "Dummy sign-in recorded",
+            `${normalized.memberType} ${normalized.identifier} • ${sessionName}`,
+            "success"
+          );
+          this.addRecent(normalized.identifier, normalized.memberType, method, sessionName);
+          this.renderRecentSignIns();
+          this.playSound("success");
+          if (method === "barcode") {
+            this.flashScanWindowSuccess();
+          }
+        }
+
+        async submit(rawValue, method, format = "") {
+          try {
+            const normalized = normalizeIdentifier(rawValue);
+            const modePrefix = this.settings.dummyMode ? "[Dummy] " : "";
+            this.setStatus(
+              `${modePrefix}Saving sign-in...`,
+              `Submitting ${normalized.identifier}${format ? ` • ${format}` : ""}`
+            );
+
+            if (this.settings.dummyMode) {
+              await this.submitDummy(normalized, method);
+              return;
+            }
+
+            const result = await this.backend.request({
+              action: "signin",
+              studentNumber: normalized.identifier,
+              method
+            });
+
+            if (result.duplicate) {
+              this.setStatus(
+                "Already signed in",
+                `${normalized.memberType} ${normalized.identifier} is already recorded. ${sessionDetail(result, this.currentSessionName)}`,
+                "error"
+              );
+              this.playSound("error");
+              return;
+            }
+
+            if (!result.success) {
+              throw new Error([result.message || "Sign-in failed.", sessionDetail(result, this.currentSessionName)].filter(Boolean).join(" "));
+            }
+
+            this.currentSessionName = result.session || this.currentSessionName;
+            this.setStatus(
+              "Sign-in recorded",
+              `${normalized.memberType} ${normalized.identifier} • ${result.session} • ${result.sessionTimes || ""}`.trim(),
+              "success"
+            );
+            this.addRecent(result.studentNumber || normalized.identifier, normalized.memberType, method, result.session || "Current session");
+            this.renderRecentSignIns();
+            this.playSound("success");
+            if (method === "barcode") {
+              this.flashScanWindowSuccess();
+            }
+          } catch (error) {
+            this.setStatus("Sign-in failed", error.message, "error");
+            this.playSound("error");
+            if (!this.settings.dummyMode) {
+              this.refreshSessionStatus();
+            }
+          }
+        }
+
+        submitManual() {
+          if (!this.unlocked && !this.settings.dummyMode) {
+            this.setStatus("Password required", "Enter the attendance password first or turn on Dummy mode.", "error");
+            return;
+          }
+
+          const value = this.el.studentInput.value.trim();
+          if (!value) {
+            this.setStatus("No value entered", "Please enter a student number or barcode.", "error");
+            return;
+          }
+
+          this.submit(value, "manual");
+          this.el.studentInput.value = "";
+          this.focusInput();
+        }
+      }
+      const app = new AttendanceApp(dom);
+      app.start();
+      window.attendanceApp = app;
+    })();
   </script>
 </body>
 </html>
